@@ -1,0 +1,25 @@
+# What HAWK is told about each target (the rules of engagement give the same facts to a human tester).
+# No API documentation here: endpoints are discovered.
+voyage:
+  portal: /portal
+  health: /healthz
+  # Test accounts by vault handle. Passwords live only in the gateway's vault.
+  identities:
+    skyline.admin: { tenant: AG-1001, role: agency_admin, privilege: 2 }
+    skyline.sub:   { tenant: AG-1001, role: sub_agent,    privilege: 1 }
+    coral.admin:   { tenant: AG-2002, role: agency_admin, privilege: 2 }
+    coral.sub:     { tenant: AG-2002, role: sub_agent,    privilege: 1 }
+  # Asset ownership (longest prefix wins).
+  owners:
+    /api/v3/bookings: bookings-platform
+    /api/v3/hotels: search-and-content
+    /api/v3/wallet: payments-and-credit
+    /api/v3/users: identity-and-access
+    /api/v3/agency: identity-and-access
+    /api/v3/auth: identity-and-access
+    /api/v3/partner: partner-integrations
+    /api/v1: mobile-legacy (archived team; escalate to platform-security)
+    /api/v2: platform-api
+  # Risk policy: tests that move money or change roles need a human unless auto-approved.
+  auto_approve: [read_only, canary_write]
+  needs_approval: [money_movement]
