@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+/* HAWK pastel system, matching the pitch deck. Light by default, dark when the OS asks. */
+:root {
+  --paper: #fbfaf7;
+  --card: #ffffff;
+  --ink: #1e2130;
+  --muted: #5b5480;
+  --line: #e4dfee;
+  --line-strong: #d9d4e8;
+  --lav: #e6e0fa;
+  --lav-ink: #4b3f8f;
+  --sky: #ddebfb;
+  --sky-ink: #234a78;
+  --peach: #fde6d6;
+  --peach-ink: #8a4413;
+  --mint: #ddf2e7;
+  --mint-ink: #1f6244;
+  --butter: #fbf1cf;
+  --butter-ink: #6e5512;
+  --coral: #fcdcd2;
+  --coral-ink: #8a2a14;
+  --accent: #7e74b8;
+  --danger: #c2462c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #15161f;
+    --card: #1d1f2b;
+    --ink: #ecebf5;
+    --muted: #a9a3cc;
+    --line: #2c2e3e;
+    --line-strong: #3a3c50;
+    --lav: #2e2a4a;
+    --lav-ink: #cfc6ff;
+    --sky: #1f3047;
+    --sky-ink: #b7d4f7;
+    --peach: #3f2c20;
+    --peach-ink: #f8c7a3;
+    --mint: #1e3a2e;
+    --mint-ink: #a9e5c6;
+    --butter: #3b331a;
+    --butter-ink: #f1dc9a;
+    --coral: #4a2520;
+    --coral-ink: #ffb9a6;
+    --accent: #a99ff0;
+    --danger: #ff8a70;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-lav: var(--lav);
+  --color-lav-ink: var(--lav-ink);
+  --color-sky: var(--sky);
+  --color-sky-ink: var(--sky-ink);
+  --color-peach: var(--peach);
+  --color-peach-ink: var(--peach-ink);
+  --color-mint: var(--mint);
+  --color-mint-ink: var(--mint-ink);
+  --color-butter: var(--butter);
+  --color-butter-ink: var(--butter-ink);
+  --color-coral: var(--coral);
+  --color-coral-ink: var(--coral-ink);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-grotesk), var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jbmono), ui-monospace, monospace;
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.dark-logo {
+  filter: none;
+}
+@media (prefers-color-scheme: dark) {
+  .dark-logo {
+    filter: invert(1) hue-rotate(180deg);
+  }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.feed-in {
+  animation: rise 360ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .feed-in { animation: none; }
+}
