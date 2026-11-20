@@ -1,0 +1,16 @@
+{
+  "targets": [
+    {
+      "name": "voyage",
+      "base_url": "http://127.0.0.1:8081",
+      "allow_paths": ["/api/", "/portal", "/static/", "/healthz", "/robots.txt", "/.well-known/"],
+      "deny_paths": ["/__ops"],
+      "allow_methods": ["GET", "POST", "PATCH", "PUT", "HEAD", "OPTIONS"],
+      "gcp_id_token": false,
+      "rate": { "rps": 8, "min_rps": 0.5, "burst": 12, "concurrency": 4 },
+      "health": { "path": "/healthz", "slow_ms": 800, "error_ratio_halt": 0.5, "interval_s": 5 },
+      "auth": { "login_path": "/api/v3/auth/login", "token_field": "token" },
+      "max_response_bytes": 262144
+    }
+  ]
+}

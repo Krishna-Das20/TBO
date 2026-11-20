@@ -1,0 +1,8 @@
+{
+  "voyage": {
+    "skyline.admin": { "email": "admin@skyline.voyage.test", "password": "Skyline-Admin-2026!" },
+    "skyline.sub": { "email": "sub@skyline.voyage.test", "password": "Skyline-Sub-2026!" },
+    "coral.admin": { "email": "admin@coral.voyage.test", "password": "Coral-Admin-2026!" },
+    "coral.sub": { "email": "sub@coral.voyage.test", "password": "Coral-Sub-2026!" }
+  }
+}
