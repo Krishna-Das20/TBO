@@ -76,8 +76,30 @@ async def enqueue(target: str, trigger: dict, run_id: str) -> str:
 async def lifespan(_: FastAPI):
     DBOS.launch()
     await DBOS.register_queue_async(QUEUE, global_concurrency=1)
+    task = asyncio.create_task(_autoscan()) if os.environ.get("HAWK_AUTOSCAN_ON_START") == "1" else None
     yield
+    if task:
+        task.cancel()
     DBOS.destroy()
+
+
+async def _autoscan() -> None:
+    """Cloud demo: an instance that starts empty (scale-to-zero, local storage) baselines itself once the
+    gateway can reach the target, so the console never opens on an empty screen."""
+    if store.runs(1):
+        return
+    for _ in range(60):
+        try:
+            async with httpx.AsyncClient(base_url=settings.gateway_url, timeout=3) as c:
+                st = (await c.get("/control/status", headers={"X-Admin-Token": settings.gateway_admin})).json()
+                if st["targets"]:
+                    break
+        except Exception:  # noqa: BLE001 - gateway still starting
+            pass
+        await asyncio.sleep(1)
+    await asyncio.sleep(3)
+    await enqueue(DEFAULT_TARGET, {"kind": "startup-baseline"},
+                  datetime.now(timezone.utc).strftime(f"baseline-{DEFAULT_TARGET}-%Y%m%d%H%M%S"))
 
 
 app = FastAPI(title="HAWK control plane", version="0.1.0", lifespan=lifespan)

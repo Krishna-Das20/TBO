@@ -1,0 +1,10 @@
+.git
+.venv
+**/__pycache__
+**/node_modules
+apps/dashboard/.next
+data/*
+!data/.gitkeep
+services/gateway/bin
+.env
+.claude
