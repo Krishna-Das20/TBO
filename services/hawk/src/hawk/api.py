@@ -52,6 +52,8 @@ async def scan_workflow(target: str, trigger: dict) -> dict:
     run_id = DBOS.workflow_id
 
     async def approve(t) -> bool:
+        if trigger.get("kind") == "startup-baseline":
+            return False  # nobody asked for this run: never move money without a person; it is held, not waited on
         topic = f"approve|{t.executor}|{t.endpoint}"
         store.event(run_id, "safety", f"awaiting human approval: {t.executor} on {t.endpoint} ({t.risk})",
                     {"pending": True, "topic": topic, "executor": t.executor, "endpoint": t.endpoint,
@@ -86,20 +88,27 @@ async def lifespan(_: FastAPI):
 async def _autoscan() -> None:
     """Cloud demo: an instance that starts empty (scale-to-zero, local storage) baselines itself once the
     gateway can reach the target, so the console never opens on an empty screen."""
-    if store.runs(1):
-        return
-    for _ in range(60):
-        try:
-            async with httpx.AsyncClient(base_url=settings.gateway_url, timeout=3) as c:
-                st = (await c.get("/control/status", headers={"X-Admin-Token": settings.gateway_admin})).json()
-                if st["targets"]:
-                    break
-        except Exception:  # noqa: BLE001 - gateway still starting
-            pass
-        await asyncio.sleep(1)
-    await asyncio.sleep(3)
-    await enqueue(DEFAULT_TARGET, {"kind": "startup-baseline"},
-                  datetime.now(timezone.utc).strftime(f"baseline-{DEFAULT_TARGET}-%Y%m%d%H%M%S"))
+    import traceback
+
+    try:
+        if store.runs(1):
+            print("autoscan: runs already exist, skipping", flush=True)
+            return
+        for _ in range(90):
+            try:
+                async with httpx.AsyncClient(base_url=settings.gateway_url, timeout=3) as c:
+                    st = (await c.get("/control/status", headers={"X-Admin-Token": settings.gateway_admin})).json()
+                    if st.get("targets"):
+                        break
+            except Exception:  # noqa: BLE001 - gateway still starting
+                pass
+            await asyncio.sleep(1)
+        await asyncio.sleep(3)
+        run_id = datetime.now(UTC).strftime(f"baseline-{DEFAULT_TARGET}-%Y%m%d%H%M%S")
+        await enqueue(DEFAULT_TARGET, {"kind": "startup-baseline"}, run_id)
+        print(f"autoscan: queued {run_id}", flush=True)
+    except Exception:  # noqa: BLE001 - never let a failed baseline take the API down, but say why
+        print("autoscan failed:\n" + traceback.format_exc(), flush=True)
 
 
 app = FastAPI(title="HAWK control plane", version="0.1.0", lifespan=lifespan)
