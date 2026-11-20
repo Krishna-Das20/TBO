@@ -1,0 +1,24 @@
+[project]
+name = "hawk-mvp"
+version = "0.1.0"
+description = "HAWK: agentic real-time DAST for B2B travel platforms (workspace root)"
+requires-python = ">=3.12,<3.13"
+
+[tool.uv.workspace]
+members = ["services/voyage", "services/hawk"]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24", "ruff>=0.8"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["services/voyage/tests", "services/hawk/tests"]
+
+[tool.ruff.lint.per-file-ignores]
+# FastAPI's Depends()/Header() defaults are the framework's idiom, not a bug.
+"services/*/src/*/app.py" = ["B008"]
+"services/hawk/src/hawk/api.py" = ["B008"]
